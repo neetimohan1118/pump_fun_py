@@ -21,27 +21,25 @@ def find_data(data, field):
                 return result
     return None
 
-def get_token_balance(base_mint: str):
+def get_token_balance(mint_str):
+    """Retrieve the token balance for a given mint."""
+    headers = {"accept": "application/json", "content-type": "application/json"}
+    payload = {
+        "jsonrpc": "2.0",
+        "method": "getTokenAccountsByOwner",
+        "params": [
+            PUB_KEY,
+            {"mint": mint_str},
+            {"encoding": "jsonParsed"}
+        ],
+    }
     try:
-
-        headers = {"accept": "application/json", "content-type": "application/json"}
-
-        payload = {
-            "id": 1,
-            "jsonrpc": "2.0",
-            "method": "getTokenAccountsByOwner",
-            "params": [
-                PUB_KEY,
-                {"mint": base_mint},
-                {"encoding": "jsonParsed"},
-            ],
-        }
-        
         response = requests.post(RPC, json=payload, headers=headers)
-        ui_amount = find_data(response.json(), "uiAmount")
-        return float(ui_amount)
+        balance = response.json().get('result', {}).get('value', [])[0].get('account', {}).get('data', {}).get('parsed', {}).get('info', {}).get('tokenAmount', {}).get('uiAmount', 0)
+        return balance
     except Exception as e:
-        return None
+        logging.error(f"Error retrieving token balance: {e}")
+        return 0
 
 def get_coin_data(mint_str):
     url = f"https://client-api-2-74b1891ee9f9.herokuapp.com/coins/{mint_str}"

@@ -1,16 +1,16 @@
-import struct
+import logging
 from solana.transaction import AccountMeta
 from spl.token.instructions import create_associated_token_account, get_associated_token_address
-from solders.pubkey import Pubkey #type: ignore
-from solders.instruction import Instruction #type: ignore
-from solders.compute_budget import set_compute_unit_limit, set_compute_unit_price #type: ignore
-from solders.transaction import VersionedTransaction #type: ignore
-from solders.message import MessageV0 #type: ignore
+from solders.pubkey import Pubkey
+from solders.instruction import Instruction
+from solders.compute_budget import set_compute_unit_limit, set_compute_unit_price
+from solders.transaction import VersionedTransaction
+from solders.message import MessageV0
 from config import payer_keypair, client
 from constants import *
-from solana.rpc.types import TokenAccountOpts
 from utils import get_coin_data, get_token_balance, confirm_txn
-from solana.rpc.types import TxOpts
+from solana.rpc.types import TokenAccountOpts, TxOpts
+
 
 def buy(mint_str, sol_in=0.01, slippage_decimal=.25):
     try:
