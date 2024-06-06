@@ -4,6 +4,10 @@ import base58
 import requests
 from config import RPC, PUB_KEY, client
 from solana.transaction import Signature
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
 
 def find_data(data, field):
     if isinstance(data, dict):
@@ -26,6 +30,7 @@ def get_token_balance(mint_str):
     headers = {"accept": "application/json", "content-type": "application/json"}
     payload = {
         "jsonrpc": "2.0",
+        "id": 1,
         "method": "getTokenAccountsByOwner",
         "params": [
             PUB_KEY,
@@ -35,7 +40,8 @@ def get_token_balance(mint_str):
     }
     try:
         response = requests.post(RPC, json=payload, headers=headers)
-        balance = response.json().get('result', {}).get('value', [])[0].get('account', {}).get('data', {}).get('parsed', {}).get('info', {}).get('tokenAmount', {}).get('uiAmount', 0)
+        response_data = response.json()
+        balance = response_data.get('result', {}).get('value', [])[0].get('account', {}).get('data', {}).get('parsed', {}).get('info', {}).get('tokenAmount', {}).get('uiAmount', 0)
         return balance
     except Exception as e:
         logging.error(f"Error retrieving token balance: {e}")
